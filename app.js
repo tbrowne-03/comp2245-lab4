@@ -73,3 +73,16 @@ async function loadBooks() {
     button.disabled = false;
   }
 }
+
+// connecting the form and the fields
+form.addEventListener('submit', (event) => {
+  event.preventDefault();
+  loadBooks();
+});
+
+subject.addEventListener('change', loadBooks);
+document.querySelector('input[name="available"]').addEventListener('change', loadBooks);
+
+// initial page load
+loadSubjects();
+loadBooks();
