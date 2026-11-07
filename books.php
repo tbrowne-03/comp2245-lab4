@@ -24,6 +24,19 @@ $sql = 'SELECT books.title,
 // Two placeholders, same pattern bound to each
 $params = [':title' => $pattern, ':author' => $pattern];
 
+// subject filter, must be a whole number
+$subject = filter_input(INPUT_GET, 'subject', FILTER_VALIDATE_INT);
+if (is_int($subject) && $subject >= 1) {
+    $sql .= ' AND books.subject_id = :subject';
+    $params[':subject'] = $subject;
+}
+
+// available filter 
+$available = filter_input(INPUT_GET, 'available', FILTER_VALIDATE_INT);
+if ($available === 1) {
+    $sql .= ' AND (books.copies - books.on_loan) > 0';
+}
+
 // Sort
 $sql .= ' ORDER BY books.title ASC';
 
