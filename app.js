@@ -24,3 +24,52 @@ async function loadSubjects() {
 
 // run on page load
 loadSubjects();
+
+async function loadBooks() {
+  const params = new URLSearchParams(new FormData(form));
+
+  button.disabled = true;
+  status.textContent = 'Searching...';
+
+  try {
+    const response = await fetch(`books.php?${params}`);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const books = await response.json();
+
+    tbody.replaceChildren();
+
+    for (const b of books) {
+      const tr = document.createElement('tr');
+      const cells = [
+        b.title,
+        b.author,
+        b.year,
+        b.subject,
+        `${b.available} of ${b.copies}`,
+      ];
+
+      cells.forEach((text, i) => {
+        const td = document.createElement('td');
+        td.textContent = text;
+        if (i === 4 && Number(b.available) === 0) {
+          td.classList.add('out');
+        }
+        tr.appendChild(td);
+      });
+
+      tbody.appendChild(tr);
+    }
+
+    if (books.length === 0) {
+      status.textContent = 'No books match your search.';
+    } else {
+      status.textContent = `${books.length} book${books.length === 1 ? '' : 's'} found.`;
+    }
+  } catch (err) {
+    console.error(err);
+    tbody.replaceChildren();
+    status.textContent = "Couldn't load the books. Please try again.";
+  } finally {
+    button.disabled = false;
+  }
+}
